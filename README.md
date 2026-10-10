@@ -112,6 +112,14 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 - **Ideas or feedback:** use **Send Feedback** in Redline's settings, or fill in the [feedback form](https://forms.gle/Gi6vb9GKv4Ars1xc8). No account needed.
 - **Bugs:** use **Report an Issue** in Redline's settings, or [open an issue](https://github.com/thihanhein20/redline/issues) on GitHub. Your Mac details are filled in for you.
 
+## Contributing
+
+Pull requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, code guidelines and how to open a PR.
+
+## License
+
+Redline is open source under the [MIT License](LICENSE).
+
 ---
 
 <p align="center">Developed by <a href="https://www.hanindustries.net/">Han Industries</a></p>
