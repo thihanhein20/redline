@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The panel shown when clicking Redline's menu bar icon.
-struct MenuBarView: View {
+/// Redline's settings: shown from the menu bar icon and in the settings window.
+struct SettingsView: View {
     @Bindable var overlay: OverlayController
     @Environment(\.openURL) private var openURL
 

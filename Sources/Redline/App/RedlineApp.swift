@@ -6,7 +6,7 @@ struct RedlineApp: App {
 
     var body: some Scene {
         MenuBarExtra("Redline", systemImage: "gauge.with.dots.needle.67percent") {
-            MenuBarView(overlay: appDelegate.overlay)
+            SettingsView(overlay: appDelegate.overlay)
         }
         .menuBarExtraStyle(.window)
     }

@@ -5,6 +5,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let overlay: OverlayController
 
+    private lazy var settingsWindow = SettingsWindow(overlay: overlay)
     private let monitor = StatsMonitor()
     private let logger = CSVLogger()
     private let metalHUD = MetalHUDService()
@@ -27,6 +28,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitor.onUpdate = { [logger] in logger.log($0) }
         monitor.start()
         overlay.show()
+        // Opened by the user (not via `redline run`): show settings so they're findable without the menu bar icon.
+        if game == nil { settingsWindow.show() }
+    }
+
+    /// Opening Redline again while it runs (Finder, Launchpad, Spotlight) brings settings back.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        settingsWindow.show()
+        return false
     }
 
     func applicationWillTerminate(_ notification: Notification) {
