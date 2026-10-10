@@ -65,16 +65,36 @@ Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in 
 
 ## For developers: exact FPS and CSV logs
 
-Testing your own Unity or Metal build? Launch it through Redline to count every frame directly, with no screen refresh cap:
+Testing your own Unity or Metal build? Run it through Redline to count every frame directly, with no screen refresh cap, and log the stats to a CSV file.
+
+### Terminal
+
+1. In Redline's settings (**⌃⌥R**), click **Install Terminal Command** and enter your Mac password.
+2. From your project folder:
 
 ```bash
-/Applications/Redline.app/Contents/MacOS/Redline run /path/to/YourGame.app > run.csv
+redline run ./Builds/MyGame.app > run.csv
 ```
 
 - Logs one CSV row per second: `timestamp, fps, cpu_pct, gpu_pct, ram_gb, soc_temp_c, thermal_state`
 - Arguments after the app path go to the game, for example `-screen-fullscreen 0`
 - Redline quits when the game exits
-- Works only for builds **without** Hardened Runtime (Unity development builds are fine). Steam/App Store games and iPhone/iPad apps can't be launched this way; open them normally instead.
+
+### Unity Editor
+
+Install the Redline package: **Window → Package Manager → + → Add package from git URL…**
+
+```
+https://github.com/thihanhein20/redline.git?path=/Unity/com.hanindustries.redline
+```
+
+Then use the new **Redline** menu:
+
+- **Build and Run with Redline**: makes a macOS development build in `Builds/Redline/` and runs it through Redline
+- **Run Last Build with Redline**: runs it again without rebuilding
+- **Open Logs Folder**: one CSV per run in `Builds/Redline/Logs/`
+
+> Works only for builds **without** Hardened Runtime (Unity development builds are fine). Steam/App Store games and iPhone/iPad apps can't be launched this way; open them normally instead.
 
 ## How it works
 
