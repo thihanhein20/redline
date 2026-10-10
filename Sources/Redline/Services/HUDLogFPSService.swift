@@ -12,7 +12,7 @@ final class HUDLogFPSService {
     private var readTask: Task<Void, Never>?
     private var previous: [Int32: HUDLogEntry] = [:]
     private var warmedUp: Set<Int32> = []
-    private var latest: (fps: Double, receivedAt: Date)?
+    private var latest: (fps: Double, processID: Int32, receivedAt: Date)?
 
     func start() {
         let pipe = Pipe()
@@ -39,9 +39,14 @@ final class HUDLogFPSService {
         if logStream.isRunning { logStream.terminate() }
     }
 
-    /// Latest FPS of whichever game reported most recently; `nil` if none in the last 2 s.
+    /// Latest FPS of whichever game reported most recently.
+    /// `nil` as soon as that game exits, or if it hasn't reported for 2 s (e.g. paused or minimised).
     func fps() -> Double? {
-        guard let latest, Date().timeIntervalSince(latest.receivedAt) < Self.staleAfter else { return nil }
+        guard let latest else { return nil }
+        guard kill(latest.processID, 0) == 0, Date().timeIntervalSince(latest.receivedAt) < Self.staleAfter else {
+            forget(latest.processID)
+            return nil
+        }
         return latest.fps
     }
 
@@ -51,6 +56,12 @@ final class HUDLogFPSService {
         guard let old = previous[entry.processID], let fps = HUDLogEntry.fps(from: old, to: entry) else { return }
         // The first interval after a game starts includes startup frames and reads far too high.
         guard !warmedUp.insert(entry.processID).inserted else { return }
-        latest = (fps, Date())
+        latest = (fps, entry.processID, Date())
+    }
+
+    private func forget(_ processID: Int32) {
+        latest = nil
+        previous[processID] = nil
+        warmedUp.remove(processID)
     }
 }
