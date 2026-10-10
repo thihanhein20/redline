@@ -5,14 +5,15 @@ import Foundation
 /// (The HUD must be visible for logging to work.)
 /// Set in the per-user launchd environment, so it also clears on logout if Redline crashes.
 struct MetalHUDService {
-    private static let variables = ["MTL_HUD_ENABLED", "MTL_HUD_LOG_ENABLED"]
+    /// Also passed directly to games started by `redline run`, which bypass the launchd environment.
+    static let environment = ["MTL_HUD_ENABLED": "1", "MTL_HUD_LOG_ENABLED": "1"]
 
     func enable() {
-        for variable in Self.variables { launchctl("setenv", variable, "1") }
+        for (variable, value) in Self.environment { launchctl("setenv", variable, value) }
     }
 
     func disable() {
-        for variable in Self.variables { launchctl("unsetenv", variable) }
+        for variable in Self.environment.keys { launchctl("unsetenv", variable) }
     }
 
     private func launchctl(_ arguments: String...) {
