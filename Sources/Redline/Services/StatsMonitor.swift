@@ -7,6 +7,7 @@ import Observation
 final class StatsMonitor {
     private(set) var stats = SystemStats()
 
+    @ObservationIgnored private let fps = FPSService()
     @ObservationIgnored private let cpu = CPUService()
     @ObservationIgnored private let gpu = GPUService()
     @ObservationIgnored private let memory = MemoryService()
@@ -30,6 +31,7 @@ final class StatsMonitor {
 
     private func refresh() {
         stats = SystemStats(
+            fps: fps.fps(),
             cpuUsage: cpu.usage(),
             gpuUsage: gpu.usage(),
             memoryUsedGB: memory.usedGB(),

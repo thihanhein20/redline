@@ -7,6 +7,7 @@ struct OverlayView: View {
     var body: some View {
         let stats = monitor.stats
         VStack(alignment: .leading, spacing: 3) {
+            StatRow(label: "FPS", value: StatFormat.fps(stats.fps))
             StatRow(label: "CPU", value: StatFormat.percent(stats.cpuUsage))
             StatRow(label: "GPU", value: StatFormat.percent(stats.gpuUsage))
             StatRow(label: "RAM", value: StatFormat.memory(used: stats.memoryUsedGB, total: stats.memoryTotalGB))

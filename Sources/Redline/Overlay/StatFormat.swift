@@ -5,6 +5,13 @@ enum StatFormat {
     static let placeholder = "--"
     static let hotCelsius = 90.0
 
+    /// "60  16.7ms": frames per second and average frame time.
+    static func fps(_ value: Double?) -> String {
+        guard let value else { return placeholder }
+        guard value > 0 else { return "0" }
+        return String(format: "%.0f  %.1fms", value, 1000 / value)
+    }
+
     static func percent(_ value: Double?) -> String {
         value.map { String(format: "%.0f%%", $0) } ?? placeholder
     }
