@@ -12,9 +12,18 @@ swift build -c release
 BIN=$(swift build -c release --show-bin-path)
 
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 # The hook must sit next to the executable; GameLauncher looks for it there.
 cp "$BIN/Redline" "$BIN/libRedlineHook.dylib" "$APP/Contents/MacOS/"
+
+# App icon: Resources/AppIcon.png (from scripts/make-icon.swift) → every size macOS needs → AppIcon.icns
+ICONSET=$(mktemp -d)/AppIcon.iconset
+mkdir -p "$ICONSET"
+for px in 16 32 128 256 512; do
+    sips -z $px $px Resources/AppIcon.png --out "$ICONSET/icon_${px}x${px}.png" >/dev/null
+    sips -z $((px * 2)) $((px * 2)) Resources/AppIcon.png --out "$ICONSET/icon_${px}x${px}@2x.png" >/dev/null
+done
+iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 
 cat > "$APP/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -25,6 +34,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>CFBundleDisplayName</key>        <string>Redline</string>
     <key>CFBundleIdentifier</key>         <string>com.thihanhein20.redline</string>
     <key>CFBundleExecutable</key>         <string>Redline</string>
+    <key>CFBundleIconFile</key>           <string>AppIcon</string>
     <key>CFBundlePackageType</key>        <string>APPL</string>
     <key>CFBundleShortVersionString</key> <string>$VERSION</string>
     <key>CFBundleVersion</key>            <string>$VERSION</string>
