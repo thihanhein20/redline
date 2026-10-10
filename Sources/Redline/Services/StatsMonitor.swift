@@ -6,6 +6,8 @@ import Observation
 @Observable
 final class StatsMonitor {
     private(set) var stats = SystemStats()
+    /// Called after every refresh, e.g. for logging.
+    @ObservationIgnored var onUpdate: ((SystemStats) -> Void)?
 
     @ObservationIgnored private let fps = FPSService()
     @ObservationIgnored private let cpu = CPUService()
@@ -39,5 +41,6 @@ final class StatsMonitor {
             socTemperature: temperature.socTemperature(),
             thermalState: ProcessInfo.processInfo.thermalState
         )
+        onUpdate?(stats)
     }
 }

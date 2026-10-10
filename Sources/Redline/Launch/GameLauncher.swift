@@ -16,10 +16,11 @@ enum GameLauncher {
         }
     }
 
-    /// `path` can be a `.app` bundle or the game binary itself.
-    static func launch(_ path: String, onExit: @escaping @Sendable () -> Void) throws -> Process {
+    /// `path` can be a `.app` bundle or the game binary itself. `arguments` are passed to the game.
+    static func launch(_ path: String, arguments: [String], onExit: @escaping @Sendable () -> Void) throws -> Process {
         let process = Process()
         process.executableURL = try executableURL(for: URL(fileURLWithPath: path))
+        process.arguments = arguments
         process.environment = ProcessInfo.processInfo.environment
             .merging(["DYLD_INSERT_LIBRARIES": try hookURL().path]) { $1 }
         process.terminationHandler = { _ in onExit() }

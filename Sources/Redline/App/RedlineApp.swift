@@ -1,8 +1,8 @@
 import AppKit
 
 /// Usage:
-///   redline                     overlay only
-///   redline run <Game.app>      launch the game with FPS counting, quit when it exits
+///   redline                                  overlay only
+///   redline run <Game.app> [game args...]   launch the game with FPS counting, quit when it exits
 @main
 enum RedlineApp {
     @MainActor
@@ -19,10 +19,11 @@ enum RedlineApp {
     private static func launchGameIfRequested() -> Process? {
         let arguments = CommandLine.arguments.dropFirst()
         guard arguments.first == "run" else { return nil }
-        guard let path = arguments.dropFirst().first else { exitWithError("Usage: redline run <Game.app>") }
+        let gameArguments = arguments.dropFirst(2)
+        guard let path = arguments.dropFirst().first else { exitWithError("Usage: redline run <Game.app> [game args...]") }
 
         do {
-            return try GameLauncher.launch(path) {
+            return try GameLauncher.launch(path, arguments: Array(gameArguments)) {
                 Task { @MainActor in NSApplication.shared.terminate(nil) }
             }
         } catch {

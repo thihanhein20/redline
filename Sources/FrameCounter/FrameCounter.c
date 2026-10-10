@@ -20,8 +20,13 @@ static SharedFrames *map_shared(int openFlags, int protection) {
     if (fd < 0) return NULL;
 
     struct stat info;
-    if ((openFlags & O_CREAT) && ftruncate(fd, sizeof(SharedFrames)) != 0) goto fail;
-    if (fstat(fd, &info) != 0 || info.st_size < (off_t)sizeof(SharedFrames)) goto fail;
+    if (fstat(fd, &info) != 0) goto fail;
+    // macOS allows sizing a shared memory object only once, so size it only when new.
+    if (info.st_size == 0 && (openFlags & O_CREAT)) {
+        if (ftruncate(fd, sizeof(SharedFrames)) != 0) goto fail;
+        info.st_size = sizeof(SharedFrames);
+    }
+    if (info.st_size < (off_t)sizeof(SharedFrames)) goto fail;
 
     void *memory = mmap(NULL, sizeof(SharedFrames), protection, MAP_SHARED, fd, 0);
     close(fd);
