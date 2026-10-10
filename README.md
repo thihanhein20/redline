@@ -67,7 +67,9 @@ Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in 
 
 Testing your own Unity or Metal build? Run it through Redline to count every frame directly, with no screen refresh cap, and log the stats to a CSV file.
 
-### Terminal
+### Terminal (preview)
+
+> **Preview:** the Terminal command is new and still being tested. Please [report anything that doesn't work](https://github.com/thihanhein20/redline/issues/new?labels=bug).
 
 1. In Redline's settings (**⌃⌥R**), click **Install Terminal Command** and enter your Mac password.
 2. From your project folder:
