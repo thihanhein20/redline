@@ -40,7 +40,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>CFBundleVersion</key>            <string>$VERSION</string>
     <key>LSMinimumSystemVersion</key>     <string>14.0</string>
     <key>LSUIElement</key>                <true/>
-    <key>NSHumanReadableCopyright</key>   <string>© $(date +%Y) Thihan Hein</string>
+    <key>NSHumanReadableCopyright</key>   <string>© $(date +%Y) Han Industries</string>
 </dict>
 </plist>
 EOF

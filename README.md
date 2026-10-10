@@ -110,3 +110,7 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 ## Feedback
 
 Found a bug or have an idea? Use **Report an Issue** or **Send Feedback** in Redline's settings, or [open an issue](https://github.com/thihanhein20/redline/issues).
+
+---
+
+<p align="center">Developed by <a href="https://www.hanindustries.net/">Han Industries</a></p>

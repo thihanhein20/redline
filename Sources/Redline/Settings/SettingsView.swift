@@ -29,9 +29,24 @@ struct SettingsView: View {
             MenuRow(title: "Quit Redline", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
             shortcutHint
+            Divider()
+            credit
         }
         .padding(14)
         .frame(width: 270)
+    }
+
+    private var credit: some View {
+        HStack(spacing: 4) {
+            Text("Developed by")
+            Link("Han Industries", destination: FeedbackLinks.developer)
+                .tint(.red)
+            Spacer()
+            Text("v\(SystemInfo.appVersion)")
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 8)
     }
 
     private var shortcutHint: some View {
