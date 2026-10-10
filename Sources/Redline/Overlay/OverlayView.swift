@@ -7,6 +7,11 @@ struct OverlayView: View {
     var body: some View {
         let stats = monitor.stats
         VStack(alignment: .leading, spacing: 3) {
+            Text("\(KeyShortcut.toggleSettings.symbol)  Settings")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white.opacity(0.45))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 4)
             StatRow(label: "FPS", value: StatFormat.fps(stats.fps))
             StatRow(label: "CPU", value: StatFormat.percent(stats.cpuUsage))
             StatRow(label: "GPU", value: StatFormat.percent(stats.gpuUsage))
@@ -15,11 +20,6 @@ struct OverlayView: View {
                     isHot: StatFormat.isHot(stats.socTemperature))
             StatRow(label: "THERM", value: StatFormat.thermal(stats.thermalState),
                     isHot: stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue)
-            Text("\(KeyShortcut.toggleSettings.symbol)  Settings")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.white.opacity(0.45))
-                .frame(maxWidth: .infinity)
-                .padding(.top, 4)
         }
         .font(.system(size: 12, weight: .semibold, design: .monospaced))
         .padding(10)
