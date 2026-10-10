@@ -40,6 +40,7 @@ Sources/HIDSensors/   C wrapper for the chip temperature sensors
 Sources/FrameCounter/ shared-memory frame counter (hook writes, Redline reads)
 Sources/RedlineHook/  library loaded into games launched with `redline run`
 Tests/RedlineTests/   unit tests
+Unity/com.hanindustries.redline/  Unity Editor package (Redline menu); keep its .meta files
 ```
 
 ## Code guidelines

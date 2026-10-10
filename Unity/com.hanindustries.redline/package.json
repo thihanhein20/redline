@@ -1,0 +1,12 @@
+{
+  "name": "com.hanindustries.redline",
+  "version": "0.1.0",
+  "displayName": "Redline",
+  "description": "Build and run your macOS game through Redline: exact, uncapped FPS plus CPU, GPU, RAM and temperature, with a CSV log of every run.",
+  "unity": "2021.3",
+  "license": "MIT",
+  "author": {
+    "name": "Han Industries",
+    "url": "https://www.hanindustries.net/"
+  }
+}

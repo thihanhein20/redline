@@ -26,6 +26,9 @@ struct SettingsView: View {
             }
             Divider()
 
+            TerminalCommandRow()
+            Divider()
+
             MenuRow(title: "Quit Redline", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
             shortcutHint

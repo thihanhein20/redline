@@ -1,12 +1,12 @@
 import Foundation
 
-/// Turns on Apple's Metal Performance HUD for every Metal app launched while Redline runs.
-/// Logging makes the HUD write frame counts to the system log, which `HUDLogFPSService` reads.
-/// (The HUD must be visible for logging to work.)
+/// Turns on Apple's Metal Performance HUD for every Metal app launched while Redline runs, hidden,
+/// with logging on: the HUD writes frame counts to the system log (read by `HUDLogFPSService`)
+/// without drawing anything in the game. Redline's own overlay shows the FPS instead.
 /// Set in the per-user launchd environment, so it also clears on logout if Redline crashes.
 struct MetalHUDService {
     /// Also passed directly to games started by `redline run`, which bypass the launchd environment.
-    static let environment = ["MTL_HUD_ENABLED": "1", "MTL_HUD_LOG_ENABLED": "1"]
+    static let environment = ["MTL_HUD_ENABLED": "1", "MTL_HUD_LOG_ENABLED": "1", "MTL_HUD_HIDDEN": "1"]
 
     func enable() {
         for (variable, value) in Self.environment { launchctl("setenv", variable, value) }
