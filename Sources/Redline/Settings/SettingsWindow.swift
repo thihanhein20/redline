@@ -18,6 +18,15 @@ final class SettingsWindow {
         window.makeKeyAndOrderFront(nil)
     }
 
+    /// Closes the window if it's in front, otherwise shows it.
+    func toggle() {
+        if let window, window.isKeyWindow {
+            window.close()
+        } else {
+            show()
+        }
+    }
+
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = "Redline"

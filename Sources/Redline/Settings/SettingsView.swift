@@ -28,9 +28,25 @@ struct SettingsView: View {
 
             MenuRow(title: "Quit Redline", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
+            shortcutHint
         }
         .padding(14)
         .frame(width: 270)
+    }
+
+    private var shortcutHint: some View {
+        HStack {
+            Text("Open settings from anywhere")
+            Spacer()
+            Text(KeyShortcut.toggleSettings.symbol)
+                .font(.caption.monospaced())
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 4))
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 8)
     }
 
     private var header: some View {

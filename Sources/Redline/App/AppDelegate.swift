@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = CSVLogger()
     private let metalHUD = MetalHUDService()
     private var game: Process?
+    private var hotKey: GlobalHotKey?
     private var signalSources: [DispatchSourceSignal] = []
 
     override init() {
@@ -28,6 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitor.onUpdate = { [logger] in logger.log($0) }
         monitor.start()
         overlay.show()
+        hotKey = GlobalHotKey(.toggleSettings) { [weak self] in self?.settingsWindow.toggle() }
         // Opened by the user (not via `redline run`): show settings so they're findable without the menu bar icon.
         if game == nil { settingsWindow.show() }
     }
