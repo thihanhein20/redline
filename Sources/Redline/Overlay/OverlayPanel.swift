@@ -19,9 +19,9 @@ final class OverlayPanel: NSPanel {
         setContentSize(hostingView.fittingSize)
     }
 
-    /// Places the panel in the top-left corner of the main screen.
-    func pinToTopLeft() {
+    /// Moves the panel to `corner` of the main screen, clear of the menu bar and Dock.
+    func pin(to corner: OverlayCorner) {
         guard let visible = NSScreen.main?.visibleFrame else { return }
-        setFrameOrigin(NSPoint(x: visible.minX + margin, y: visible.maxY - frame.height - margin))
+        setFrameOrigin(corner.origin(for: frame.size, in: visible, margin: margin))
     }
 }

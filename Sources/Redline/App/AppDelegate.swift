@@ -1,26 +1,32 @@
 import AppKit
 
-/// Wires the stats monitor to the overlay once the app has launched.
+/// App lifecycle: starts monitoring, the overlay and the Metal HUD; cleans up on quit.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    let overlay: OverlayController
+
     private let monitor = StatsMonitor()
     private let logger = CSVLogger()
     private let metalHUD = MetalHUDService()
-    private var overlay: OverlayPanel?
+    private var game: Process?
     private var signalSources: [DispatchSourceSignal] = []
 
+    override init() {
+        overlay = OverlayController(monitor: monitor)
+        super.init()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Accessory: menu bar only, no Dock icon, never steals focus from the game.
+        NSApplication.shared.setActivationPolicy(.accessory)
         quitCleanlyOnSignals()
         metalHUD.enable()
+        game = LaunchArguments.launchGameIfRequested()
 
         logger.start()
         monitor.onUpdate = { [logger] in logger.log($0) }
         monitor.start()
-
-        let panel = OverlayPanel(content: OverlayView(monitor: monitor))
-        panel.pinToTopLeft()
-        panel.orderFrontRegardless()
-        overlay = panel
+        overlay.show()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
