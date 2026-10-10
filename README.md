@@ -52,14 +52,14 @@ xattr -dr com.apple.quarantine /Applications/Redline.app
 ## How to use
 
 1. **Open Redline first**, then open your game. Games that were already running need a restart.
-2. The overlay appears in the top-left corner. Apple's Metal HUD also shows inside the game; Redline reads its frame count to get FPS.
+2. The overlay appears in the top-left corner and shows FPS a few seconds after the game starts.
 3. Press **⌃⌥R** (Control + Option + R) or click the gauge icon in the menu bar to:
    - show or hide the overlay
    - move it to another corner
    - send feedback or report an issue
    - quit Redline
 
-When you quit Redline, Apple's Metal HUD is turned off again for newly opened apps.
+Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in the background, so nothing extra is drawn in your game. It's switched off again when you quit Redline.
 
 > **Can't see the menu bar icon?** On MacBooks with a notch, a crowded menu bar can hide it behind the notch. Use **⌃⌥R** instead, or hold **⌘** and drag other menu bar icons to make room.
 
@@ -80,7 +80,7 @@ Testing your own Unity or Metal build? Launch it through Redline to count every 
 
 | Stat | Source |
 |---|---|
-| FPS (any game) | Apple's Metal Performance HUD, which Redline turns on while running and reads from the system log |
+| FPS (any game) | Apple's Metal Performance HUD, which Redline turns on (hidden) while running and reads from the system log |
 | FPS (`redline run`) | a small library loaded into your game that counts each frame it draws |
 | CPU | per-core CPU time from the macOS kernel |
 | GPU | GPU driver utilisation statistics |
@@ -103,7 +103,6 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 
 ## Known limitations
 
-- Apple's Metal HUD stays visible in games while Redline runs: macOS only logs FPS when the HUD is shown.
 - Temperature is the hottest chip sensor; separate CPU and GPU temperatures are planned.
 - Some games capture the whole keyboard, so **⌃⌥R** may not work inside them. Use the menu bar icon instead.
 
