@@ -1,19 +1,10 @@
 import Foundation
 
-/// Web links: developer site and pre-filled GitHub issue pages for feedback and bug reports.
+/// Web links: developer site, feedback form (no account needed) and pre-filled GitHub bug reports.
 enum FeedbackLinks {
     static let repository = URL(string: "https://github.com/thihanhein20/redline")!
     static let developer = URL(string: "https://www.hanindustries.net/")!
-
-    static var sendFeedback: URL {
-        newIssue(label: "enhancement", body: """
-            **What would make Redline better?**
-
-
-            ---
-            \(SystemInfo.summary)
-            """)
-    }
+    static let sendFeedback = URL(string: "https://forms.gle/Gi6vb9GKv4Ars1xc8")!
 
     static var reportIssue: URL {
         newIssue(label: "bug", body: """

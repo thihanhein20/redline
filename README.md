@@ -109,7 +109,8 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 
 ## Feedback
 
-Found a bug or have an idea? Use **Report an Issue** or **Send Feedback** in Redline's settings, or [open an issue](https://github.com/thihanhein20/redline/issues).
+- **Ideas or feedback:** use **Send Feedback** in Redline's settings, or fill in the [feedback form](https://forms.gle/Gi6vb9GKv4Ars1xc8). No account needed.
+- **Bugs:** use **Report an Issue** in Redline's settings, or [open an issue](https://github.com/thihanhein20/redline/issues) on GitHub. Your Mac details are filled in for you.
 
 ---
 
