@@ -6,6 +6,8 @@ import Observation
 @Observable
 final class StatsMonitor {
     private(set) var stats = SystemStats()
+    /// FPS for the last 60 seconds, for the overlay's graph.
+    private(set) var fpsHistory = History(capacity: 60)
     /// Called after every refresh, e.g. for logging.
     @ObservationIgnored var onUpdate: ((SystemStats) -> Void)?
 
@@ -45,6 +47,7 @@ final class StatsMonitor {
             socTemperature: temperature.socTemperature(),
             thermalState: ProcessInfo.processInfo.thermalState
         )
+        fpsHistory.append(stats.fps)
         onUpdate?(stats)
     }
 }
