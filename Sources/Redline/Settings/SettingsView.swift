@@ -27,6 +27,9 @@ struct SettingsView: View {
             .opacity(overlay.isVisible ? 1 : 0.4)
             Divider()
 
+            RecordingRow(sessions: sessions)
+            Divider()
+
             if let last = sessions.last {
                 LastSessionView(summary: last)
                 Divider()
@@ -43,7 +46,7 @@ struct SettingsView: View {
 
             MenuRow(title: "Quit Redline", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
-            shortcutHint
+            ShortcutList()
             Divider()
             credit
         }
@@ -58,21 +61,6 @@ struct SettingsView: View {
                 .tint(.red)
             Spacer()
             Text("v\(SystemInfo.appVersion)")
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 8)
-    }
-
-    private var shortcutHint: some View {
-        HStack {
-            Text("Open settings from anywhere")
-            Spacer()
-            Text(KeyShortcut.toggleSettings.symbol)
-                .font(.caption.monospaced())
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 4))
         }
         .font(.caption)
         .foregroundStyle(.secondary)

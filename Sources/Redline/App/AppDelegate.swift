@@ -40,6 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlay.show()
         hotKeys = [
             GlobalHotKey(.toggleSettings) { [weak self] in self?.settingsWindow.toggle() },
+            GlobalHotKey(.toggleOverlay) { [weak self] in self?.overlay.isVisible.toggle() },
             GlobalHotKey(.addMarker) { [weak self] in self?.monitor.addMarker() },
         ]
         // Opened by the user (not via `redline run`): show settings so they're findable without the menu bar icon.

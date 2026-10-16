@@ -20,6 +20,7 @@
 - **Battery**: charge and drain in watts
 - **Compact or Full overlay**: just the essentials, or everything above
 - **Session summary** when you close a game: average FPS, worst 1% low, stutters, max temperature, peak power and memory
+- **Record sessions**: one CSV log and summary saved for every game you play, no Terminal needed
 - **Overlay in any corner**: transparent, click-through, stays on top of full-screen games
 - **No permissions needed**: no Screen Recording, no Accessibility
 - **Menu bar app**: no Dock icon, open settings anywhere with **⌃⌥R**
@@ -62,11 +63,12 @@ xattr -dr com.apple.quarantine /Applications/Redline.app
    - show or hide the overlay
    - move it to another corner
    - switch between **Compact** and **Full**
+   - turn on **Record sessions** to save a CSV and summary for every game (in `~/Library/Logs/Redline/`, open it with **Show Logs in Finder**)
    - see the **last session** summary
    - send feedback or report an issue
    - quit Redline
 
-Press **⌃⌥M** to drop a **marker** (for example "boss fight starts"). It flashes on the overlay and is saved in the CSV log.
+Press **⌃⌥O** to show or hide the overlay (handy for screenshots), and **⌃⌥M** to drop a **marker** (for example "boss fight starts"). It flashes on the overlay and is saved in the CSV log.
 
 Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in the background, so nothing extra is drawn in your game. It's switched off again when you quit Redline.
 

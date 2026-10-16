@@ -12,6 +12,12 @@ struct KeyShortcut {
         symbol: "⌃⌥R"
     )
 
+    static let toggleOverlay = KeyShortcut(
+        keyCode: UInt32(kVK_ANSI_O),
+        modifiers: UInt32(controlKey | optionKey),
+        symbol: "⌃⌥O"
+    )
+
     static let addMarker = KeyShortcut(
         keyCode: UInt32(kVK_ANSI_M),
         modifiers: UInt32(controlKey | optionKey),
