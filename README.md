@@ -13,8 +13,13 @@
 
 ## Features
 
-- **FPS for any Metal game**: App Store, Steam, iPhone/iPad games on Mac, and your own builds
-- **CPU, GPU, RAM, chip temperature** and macOS thermal state, updated every second
+- **FPS for any Metal game**: App Store, Steam, iPhone/iPad games on Mac, and your own builds, with a 60-second FPS graph
+- **The game itself**: its own CPU and memory use, not just the whole Mac's
+- **Chip**: CPU and GPU temperatures, power draw (watts), clock speeds, thermal state
+- **Memory**: RAM, memory pressure and swap, the usual causes of stutters
+- **Battery**: charge and drain in watts
+- **Compact or Full overlay**: just the essentials, or everything above
+- **Session summary** when you close a game: average FPS, worst 1% low, stutters, max temperature, peak power and memory
 - **Overlay in any corner**: transparent, click-through, stays on top of full-screen games
 - **No permissions needed**: no Screen Recording, no Accessibility
 - **Menu bar app**: no Dock icon, open settings anywhere with **⌃⌥R**
@@ -56,8 +61,12 @@ xattr -dr com.apple.quarantine /Applications/Redline.app
 3. Press **⌃⌥R** (Control + Option + R) or click the gauge icon in the menu bar to:
    - show or hide the overlay
    - move it to another corner
+   - switch between **Compact** and **Full**
+   - see the **last session** summary
    - send feedback or report an issue
    - quit Redline
+
+Press **⌃⌥M** to drop a **marker** (for example "boss fight starts"). It flashes on the overlay and is saved in the CSV log.
 
 Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in the background, so nothing extra is drawn in your game. It's switched off again when you quit Redline.
 
@@ -66,6 +75,13 @@ Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in 
 ## For developers: exact FPS and CSV logs
 
 Testing your own Unity or Metal build? Run it through Redline to count every frame directly, with no screen refresh cap, and log the stats to a CSV file.
+
+Launched this way, Redline also measures frame pacing:
+
+- **1% low FPS**: average FPS of the slowest 1% of frames, the standard stutter number
+- **Stutters**: frames that took more than twice as long as a typical frame
+- **Frame-time graph**: every frame of the last ~2 seconds; spikes are hitches
+- **GPU time per frame**: tells you whether slow frames are GPU-bound
 
 ### Terminal (preview)
 
@@ -78,9 +94,24 @@ Testing your own Unity or Metal build? Run it through Redline to count every fra
 redline run ./Builds/MyGame.app > run.csv
 ```
 
-- Logs one CSV row per second: `timestamp, fps, cpu_pct, gpu_pct, ram_gb, soc_temp_c, thermal_state`
+- Logs one CSV row per second with every stat Redline measures (FPS, 1% low, stutters, GPU time, the game's CPU and memory, temperatures, power, clocks, battery, markers…)
+- The game's own output and the session summary go to the Terminal (stderr), so the CSV stays clean
 - Arguments after the app path go to the game, for example `-screen-fullscreen 0`
 - Redline quits when the game exits
+
+Compare two runs, for example before and after an optimisation:
+
+```bash
+redline compare before.csv after.csv
+```
+
+```
+                    before     after           Change
+Average FPS           57.1      60.0     +5.1% better
+Average 1% low         7.6      25.4   +234.7% better
+Stutters                 4         0   -100.0% better
+Average power        4.5 W     3.5 W    -22.9% better
+```
 
 ### Unity Editor
 
@@ -94,7 +125,7 @@ Then use the new **Redline** menu:
 
 - **Build and Run with Redline**: makes a macOS development build in `Builds/Redline/` and runs it through Redline
 - **Run Last Build with Redline**: runs it again without rebuilding
-- **Open Logs Folder**: one CSV per run in `Builds/Redline/Logs/`
+- **Open Logs Folder**: one CSV per run in `Builds/Redline/Logs/`, plus a `.txt` with the game's output and the session summary
 
 > Works only for builds **without** Hardened Runtime (Unity development builds are fine). Steam/App Store games and iPhone/iPad apps can't be launched this way; open them normally instead.
 
@@ -104,10 +135,14 @@ Then use the new **Redline** menu:
 |---|---|
 | FPS (any game) | Apple's Metal Performance HUD, which Redline turns on (hidden) while running and reads from the system log |
 | FPS (`redline run`) | a small library loaded into your game that counts each frame it draws |
+| Frame pacing, GPU time (`redline run`) | per-frame timestamps from that library, and Apple's HUD output from the game |
 | CPU | per-core CPU time from the macOS kernel |
 | GPU | GPU driver utilisation statistics |
-| RAM | same formula as Activity Monitor's "Memory Used" |
-| Temperature | hottest chip die sensor (the same sensors the open-source Stats app reads) |
+| Game CPU and memory | the game process's CPU time and memory footprint (same as Activity Monitor) |
+| RAM, pressure, swap | Activity Monitor's formulas and macOS memory pressure |
+| CPU and GPU temperature | the Mac's SMC sensors (the same ones Stats and iStat Menus read) |
+| Power and clock speeds | Apple's IOReport energy and performance-state counters (the same source as `powermetrics`, without sudo) |
+| Battery | the battery driver's charge, current and voltage |
 
 Redline makes no network requests and collects no data.
 
@@ -125,7 +160,8 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 
 ## Known limitations
 
-- Temperature is the hottest chip sensor; separate CPU and GPU temperatures are planned.
+- Clock speeds are read on M1 and M2 chips; on other chips those rows are hidden.
+- Frame pacing (1% low, stutters, frame-time graph, GPU time) needs `redline run`; for other games macOS only reports FPS about once a second.
 - Some games capture the whole keyboard, so **⌃⌥R** may not work inside them. Use the menu bar icon instead.
 
 ## Feedback

@@ -13,12 +13,12 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "Redline",
-            dependencies: ["HIDSensors", "FrameCounter"]
+            dependencies: ["Sensors", "FrameCounter"]
         ),
-        // C wrapper around the private IOHIDEventSystem API used for temperatures.
+        // C wrappers around private sensor APIs: HID and SMC temperatures, IOReport power and clocks.
         .target(
-            name: "HIDSensors",
-            linkerSettings: [.linkedFramework("IOKit")]
+            name: "Sensors",
+            linkerSettings: [.linkedFramework("IOKit"), .linkedLibrary("IOReport")]
         ),
         // Shared-memory frame counter: written by the hook, read by Redline.
         .target(name: "FrameCounter"),

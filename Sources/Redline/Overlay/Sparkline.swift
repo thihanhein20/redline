@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// A tiny line graph of recent readings, scaled from 0 to at least `minimumTop`.
+/// A tiny line graph of recent readings (FPS per second, or frame times), scaled from 0 to at least `minimumTop`.
 /// Gaps (`nil`) break the line, so "no game running" never looks like "0 FPS".
 struct Sparkline: View {
     let values: [Double?]
     let capacity: Int
     var minimumTop = 60.0
+    var color = Color.red
 
     var body: some View {
         Canvas { context, size in
@@ -17,11 +18,10 @@ struct Sparkline: View {
             for segment in Self.segments(values, capacity: capacity, top: top, in: area) {
                 var line = Path()
                 line.addLines(segment)
-                context.stroke(line, with: .color(.red), style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
+                context.stroke(line, with: .color(color), style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
             }
         }
         .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 3))
-        .accessibilityLabel("FPS over the last \(capacity) seconds")
     }
 
     /// Points for each unbroken run of readings. The newest reading sits at the right edge.

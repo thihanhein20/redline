@@ -70,7 +70,7 @@ namespace HanIndustries.Redline.Editor
         static void Launch(string command)
         {
             var log = RedlineLauncher.Run(command, AppPath, LogFolder);
-            Debug.Log($"Redline: running {AppPath}. Stats are logged to {log}");
+            Debug.Log($"Redline: running {AppPath}. Stats are logged to {log} (session summary in the .txt next to it)");
         }
 
         static string FindCommandOrExplain()

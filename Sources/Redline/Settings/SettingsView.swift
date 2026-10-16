@@ -3,6 +3,7 @@ import SwiftUI
 /// Redline's settings: shown from the menu bar icon and in the settings window.
 struct SettingsView: View {
     @Bindable var overlay: OverlayController
+    let sessions: SessionRecorder
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -15,10 +16,21 @@ struct SettingsView: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
                 CornerPicker(selection: $overlay.corner)
-                    .disabled(!overlay.isVisible)
-                    .opacity(overlay.isVisible ? 1 : 0.4)
+                Picker("Detail", selection: $overlay.detail) {
+                    ForEach(OverlayDetail.allCases, id: \.self) { Text($0.title) }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .help("Compact: FPS, CPU, GPU, temperature. Full: everything Redline measures.")
             }
+            .disabled(!overlay.isVisible)
+            .opacity(overlay.isVisible ? 1 : 0.4)
             Divider()
+
+            if let last = sessions.last {
+                LastSessionView(summary: last)
+                Divider()
+            }
 
             VStack(spacing: 2) {
                 MenuRow(title: "Send Feedback", systemImage: "bubble.left") { openURL(FeedbackLinks.sendFeedback) }

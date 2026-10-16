@@ -1,0 +1,47 @@
+import Foundation
+
+/// Totals for one play session: what a tester wants to know after closing the game.
+struct SessionSummary {
+    var game: String?
+    var startedAt = Date()
+    var seconds = 0
+    var minFPS: Double?
+    var worstOnePercentLow: Double?
+    var stutters = 0
+    var maxCPUTemperature: Double?
+    var maxGPUTemperature: Double?
+    var peakPowerWatts: Double?
+    var peakGameMemoryMB: Double?
+    var throttledSeconds = 0
+    var markers = 0
+    private var fpsTotal = 0.0
+    private var fpsSamples = 0
+
+    var averageFPS: Double? {
+        fpsSamples > 0 ? fpsTotal / Double(fpsSamples) : nil
+    }
+
+    /// Adds one second of readings.
+    mutating func add(_ stats: SystemStats) {
+        seconds += 1
+        game = stats.game?.name ?? game
+        if let fps = stats.fps {
+            fpsTotal += fps
+            fpsSamples += 1
+            minFPS = Swift.min(minFPS ?? fps, fps)
+        }
+        if let low = stats.pacing?.onePercentLowFPS { worstOnePercentLow = Swift.min(worstOnePercentLow ?? low, low) }
+        stutters = Swift.max(stutters, stats.pacing?.stutters ?? 0)
+        maxCPUTemperature = Self.max(maxCPUTemperature, stats.cpuTemperature ?? stats.socTemperature)
+        maxGPUTemperature = Self.max(maxGPUTemperature, stats.gpuTemperature)
+        peakPowerWatts = Self.max(peakPowerWatts, stats.power?.totalWatts)
+        peakGameMemoryMB = Self.max(peakGameMemoryMB, stats.game?.memoryMB)
+        if stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue { throttledSeconds += 1 }
+        if stats.marker != nil { markers += 1 }
+    }
+
+    private static func max(_ current: Double?, _ new: Double?) -> Double? {
+        guard let new else { return current }
+        return Swift.max(current ?? new, new)
+    }
+}
