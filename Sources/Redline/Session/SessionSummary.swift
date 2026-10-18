@@ -12,6 +12,11 @@ struct SessionSummary {
     var maxGPUTemperature: Double?
     var peakPowerWatts: Double?
     var peakGameMemoryMB: Double?
+    var fastestMemoryGrowthMBPerMinute: Double?
+    var peakSwapGB: Double?
+    var swappingSeconds = 0
+    var peakGameGPUPercent: Double?
+    var peakGameCPUPowerWatts: Double?
     var throttledSeconds = 0
     var markers = 0
     private var fpsTotal = 0.0
@@ -36,6 +41,11 @@ struct SessionSummary {
         maxGPUTemperature = Self.max(maxGPUTemperature, stats.gpuTemperature)
         peakPowerWatts = Self.max(peakPowerWatts, stats.power?.totalWatts)
         peakGameMemoryMB = Self.max(peakGameMemoryMB, stats.game?.memoryMB)
+        fastestMemoryGrowthMBPerMinute = Self.max(fastestMemoryGrowthMBPerMinute, stats.game?.memoryGrowthMBPerMinute)
+        peakSwapGB = Self.max(peakSwapGB, stats.swapUsedGB)
+        if (stats.swapInMBps ?? 0) + (stats.swapOutMBps ?? 0) >= 1 { swappingSeconds += 1 }
+        peakGameGPUPercent = Self.max(peakGameGPUPercent, stats.game?.gpuPercent)
+        peakGameCPUPowerWatts = Self.max(peakGameCPUPowerWatts, stats.game?.cpuPowerWatts)
         if stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue { throttledSeconds += 1 }
         if stats.marker != nil { markers += 1 }
     }

@@ -1,8 +1,10 @@
 import Foundation
 
-/// A full `metal-HUD: frames,a,b,interval,gpu,interval,gpu,…` line, as Apple's HUD prints it to the
+/// A full `metal-HUD: frames,metalMB,appMB,interval,gpu,interval,gpu,…` line, as Apple's HUD prints it to the
 /// output of games Redline launches. The pairs are (frame interval ms, GPU time ms) for recent frames.
 struct HUDFrameReport: Equatable {
+    /// GPU (Metal) memory the game has allocated.
+    var metalMemoryMB: Double
     var frameIntervalsMS: [Double]
     var gpuTimesMS: [Double]
 
@@ -12,8 +14,9 @@ struct HUDFrameReport: Equatable {
         guard fields.count >= 5 else { return nil }
         let pairs = fields.dropFirst(3)
         let values = pairs.compactMap { $0 }
-        guard values.count == pairs.count, values.count.isMultiple(of: 2) else { return nil }
+        guard values.count == pairs.count, values.count.isMultiple(of: 2), let metal = fields[1] else { return nil }
         return HUDFrameReport(
+            metalMemoryMB: metal,
             frameIntervalsMS: stride(from: 0, to: values.count, by: 2).map { values[$0] },
             gpuTimesMS: stride(from: 1, to: values.count, by: 2).map { values[$0] }
         )

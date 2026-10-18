@@ -14,9 +14,9 @@
 ## Features
 
 - **FPS for any Metal game**: App Store, Steam, iPhone/iPad games on Mac, and your own builds, with a 60-second FPS graph
-- **The game itself**: its own CPU and memory use, not just the whole Mac's
+- **The game itself**: its own CPU, GPU, memory (with a leak warning and memory graph), GPU memory, disk activity and threads
 - **Chip**: CPU and GPU temperatures, power draw (watts), clock speeds, thermal state
-- **Memory**: RAM, memory pressure and swap, the usual causes of stutters
+- **Memory**: RAM with an Activity Monitor-style breakdown (app, wired, compressed, cached), memory pressure, swap size and live swap activity, GPU memory
 - **Battery**: charge and drain in watts
 - **Compact or Full overlay**: just the essentials, or everything above
 - **Session summary** when you close a game: average FPS, worst 1% low, stutters, max temperature, peak power and memory
@@ -140,8 +140,11 @@ Then use the new **Redline** menu:
 | Frame pacing, GPU time (`redline run`) | per-frame timestamps from that library, and Apple's HUD output from the game |
 | CPU | per-core CPU time from the macOS kernel |
 | GPU | GPU driver utilisation statistics |
-| Game CPU and memory | the game process's CPU time and memory footprint (same as Activity Monitor) |
-| RAM, pressure, swap | Activity Monitor's formulas and macOS memory pressure |
+| Game CPU, memory, disk, threads | the game process's CPU time, memory footprint, disk I/O and threads (same as Activity Monitor) |
+| Game GPU | the GPU driver's per-app GPU time (Activity Monitor's % GPU) |
+| Memory leak warning | growth of the game's memory over the last minute (after a 10-second warm-up, since games grow while loading) |
+| RAM, breakdown, pressure, swap | Activity Monitor's formulas, macOS memory pressure and swap counters |
+| GPU memory | the GPU driver's memory statistics; per game (VRAM) from Apple's HUD output with `redline run` |
 | CPU and GPU temperature | the Mac's SMC sensors (the same ones Stats and iStat Menus read) |
 | Power and clock speeds | Apple's IOReport energy and performance-state counters (the same source as `powermetrics`, without sudo) |
 | Battery | the battery driver's charge, current and voltage |

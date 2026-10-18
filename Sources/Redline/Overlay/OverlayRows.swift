@@ -20,23 +20,11 @@ enum OverlayRows {
 
         items += [.stat(label: "CPU", value: StatFormat.percent(stats.cpuUsage)),
                   .stat(label: "GPU", value: StatFormat.percent(stats.gpuUsage))]
-        if full { items += memoryAndGame(stats) }
+        if full, let game = stats.game { items += gameRows(game) }
+        items += memoryRows(stats, full: full)
         items += temperatures(stats, full: full)
         if full { items += powerAndBattery(stats) }
         items.append(.stat(label: "THERM", value: StatFormat.thermal(stats.thermalState), emphasis: thermalEmphasis(stats.thermalState)))
-        return items
-    }
-
-    private static func memoryAndGame(_ stats: SystemStats) -> [OverlayItem] {
-        var items: [OverlayItem] = []
-        if let game = stats.game { items.append(.stat(label: "GAME", value: StatFormat.game(game))) }
-        let pressure: OverlayItem.Emphasis = switch stats.memoryPressure {
-        case .critical: .hot
-        case .warning: .warning
-        default: .normal
-        }
-        items.append(.stat(label: "RAM", value: StatFormat.memory(used: stats.memoryUsedGB, total: stats.memoryTotalGB), emphasis: pressure))
-        if let swap = stats.swapUsedGB, swap >= 0.05 { items.append(.stat(label: "SWAP", value: String(format: "%.1f GB", swap), emphasis: .warning)) }
         return items
     }
 

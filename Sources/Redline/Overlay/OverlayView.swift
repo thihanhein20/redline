@@ -42,6 +42,14 @@ struct OverlayView: View {
             Sparkline(values: monitor.stats.pacing?.frameTimesMS ?? [], capacity: 120, minimumTop: 33.4, color: .orange)
                 .frame(height: 20)
                 .padding(.bottom, 2)
+        case .gameMemoryGraph:
+            // The game's memory (MB) over the last minute; a line that keeps climbing suggests a leak.
+            Sparkline(values: monitor.game.memoryHistory.values, capacity: monitor.game.memoryHistory.capacity,
+                      minimumTop: 1, color: .cyan, startsAtZero: false)
+                .frame(height: 18)
+                .padding(.bottom, 2)
+        case .memoryBar(let breakdown):
+            MemoryBar(breakdown: breakdown, totalGB: monitor.stats.memoryTotalGB)
         case .marker(let number):
             Text("● MARKER \(number)")
                 .foregroundStyle(.yellow)

@@ -22,12 +22,13 @@ final class StatsMonitor {
     @ObservationIgnored private let cpu = CPUService()
     @ObservationIgnored private let gpu = GPUService()
     @ObservationIgnored private let memory = MemoryService()
-    @ObservationIgnored private let process = ProcessService()
+    /// The game being measured (its memory history feeds the overlay's memory graph).
+    let game = GameTracker()
     @ObservationIgnored private let temperature = TemperatureService()
     @ObservationIgnored private let power = PowerService()
     @ObservationIgnored private let battery = BatteryService()
     @ObservationIgnored private let display = DisplayService()
-    @ObservationIgnored private var latestGPUFrame: (ms: Double, at: Date)?
+    @ObservationIgnored private var latestHUDReport: (report: HUDFrameReport, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     func start(interval: Duration = .seconds(1)) {
@@ -56,25 +57,31 @@ final class StatsMonitor {
 
     /// Output lines from a game started by `redline run` (Apple HUD lines carry GPU time per frame).
     func receiveGameOutput(_ line: String) {
-        if let gpuMS = HUDFrameReport.parse(line)?.medianGPUTimeMS { latestGPUFrame = (gpuMS, Date()) }
+        if let report = HUDFrameReport.parse(line) { latestHUDReport = (report, Date()) }
     }
 
     private func refresh() {
         // Hook FPS (games run via `redline run`) is exact and uncapped; HUD log covers every other game.
         let currentFPS = fps.fps() ?? hudFPS.fps()
-        let gameID = launchedGameID ?? hudFPS.processID
+        let hudReport = latestHUDReport.flatMap { Date().timeIntervalSince($0.at) < 2 ? $0.report : nil }
+        let gpuReading = gpu.sample()
+        let memoryReading = memory.sample()
         stats = SystemStats(
             fps: currentFPS,
             pacing: frameTiming.sample(),
-            gpuFrameMS: latestGPUFrame.flatMap { Date().timeIntervalSince($0.at) < 2 ? $0.ms : nil },
+            gpuFrameMS: hudReport?.medianGPUTimeMS,
             displayHz: display.refreshRate(),
             cpuUsage: cpu.usage(),
-            gpuUsage: gpu.usage(),
-            memoryUsedGB: memory.usedGB(),
+            gpuUsage: gpuReading.usage,
+            memoryUsedGB: memoryReading?.usedGB,
             memoryTotalGB: memory.totalGB,
+            memoryBreakdown: memoryReading?.breakdown,
             memoryPressure: memory.pressure(),
             swapUsedGB: memory.swapUsedGB(),
-            game: gameID.flatMap { process.stats(for: $0) },
+            swapInMBps: memoryReading?.swapInMBps,
+            swapOutMBps: memoryReading?.swapOutMBps,
+            gpuMemoryMB: gpuReading.memoryInUseMB,
+            game: game.sample(processID: launchedGameID ?? hudFPS.processID, metalMemoryMB: hudReport?.metalMemoryMB),
             cpuTemperature: temperature.cpu(),
             gpuTemperature: temperature.gpu(),
             socTemperature: temperature.soc(),
@@ -87,4 +94,5 @@ final class StatsMonitor {
         fpsHistory.append(currentFPS)
         onUpdate?(stats)
     }
+
 }

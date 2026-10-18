@@ -14,8 +14,13 @@ struct SystemStats {
     var gpuUsage: Double?
     var memoryUsedGB: Double?
     var memoryTotalGB: Double = 0
+    var memoryBreakdown: MemoryBreakdown?
     var memoryPressure: MemoryPressure?
     var swapUsedGB: Double?
+    var swapInMBps: Double?
+    var swapOutMBps: Double?
+    /// GPU memory in use across all apps.
+    var gpuMemoryMB: Double?
 
     // The game being measured
     var game: GameProcess?

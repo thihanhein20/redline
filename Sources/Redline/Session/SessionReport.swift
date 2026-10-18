@@ -16,8 +16,15 @@ enum SessionReport {
             ("Max GPU temp", celsius(summary.maxGPUTemperature)),
             ("Peak power", summary.peakPowerWatts.map { String(format: "%.1f W", $0) } ?? StatFormat.placeholder),
             ("Peak game memory", summary.peakGameMemoryMB.map { String(format: "%.0f MB", $0) } ?? StatFormat.placeholder),
+            ("Peak game GPU", summary.peakGameGPUPercent.map { StatFormat.percent($0) } ?? StatFormat.placeholder),
+            ("Peak game CPU power", summary.peakGameCPUPowerWatts.map(StatFormat.watts) ?? StatFormat.placeholder),
+            ("Peak swap", summary.peakSwapGB.map { String(format: "%.1f GB", $0) } ?? StatFormat.placeholder),
+            ("Time swapping", duration(summary.swappingSeconds)),
             ("Time throttled", duration(summary.throttledSeconds)),
         ]
+        if let growth = summary.fastestMemoryGrowthMBPerMinute, growth >= OverlayRows.leakWarningMBPerMinute {
+            lines.append(("Memory growth", String(format: "up to %.0f MB/min (possible leak)", growth)))
+        }
         if summary.markers > 0 { lines.append(("Markers", "\(summary.markers)")) }
         return lines
     }
