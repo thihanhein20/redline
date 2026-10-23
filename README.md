@@ -9,6 +9,8 @@
   See FPS, CPU, GPU, RAM and temperature on top of any game.
 </p>
 
+<p align="center"><b>Public beta (0.2.0).</b> Works on the tested Mac; reports from other Macs are very welcome.</p>
+
 ---
 
 ## Features
