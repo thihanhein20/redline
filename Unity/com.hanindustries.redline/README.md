@@ -2,7 +2,7 @@
 
 Adds a **Redline** menu to the Unity Editor on macOS:
 
-- **Build and Run with Redline**: makes a macOS development build in `Builds/Redline/` and runs it through Redline, with exact, uncapped FPS and a CSV log of every run.
+- **Build and Run with Redline**: makes a macOS development build in `Builds/Redline/` and runs it through Redline, with uncapped, frame-by-frame FPS and a CSV log of every run.
 - **Run Last Build with Redline**: runs the last build again without rebuilding.
 - **Open Logs Folder**: one CSV per run in `Builds/Redline/Logs/`, plus a `.txt` with the game's output and a session summary (average FPS, 1% low, stutters, max temperature…).
 

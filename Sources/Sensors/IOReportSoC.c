@@ -118,7 +118,8 @@ SoCSample soc_sample(void) {
     if (previous && current && seconds > 0) {
         CFDictionaryRef delta = IOReportCreateSamplesDelta(previous, current, NULL);
         CFArrayRef items = delta ? CFDictionaryGetValue(delta, CFSTR("IOReportChannels")) : NULL;
-        double cpu = 0, gpuEnergy = 0, other = 0;
+        // NAN until the channel is actually seen: a chip without it shows "unavailable", never 0 W.
+        double cpu = NAN, gpuEnergy = NAN, other = 0;
         for (CFIndex i = 0; items && i < CFArrayGetCount(items); i++) {
             CFDictionaryRef channel = CFArrayGetValueAtIndex(items, i);
             if (named(channel, CFSTR("CPU Energy"))) cpu = joules(channel);
@@ -131,7 +132,7 @@ SoCSample soc_sample(void) {
         result.valid = items != NULL;
         result.cpuWatts = cpu / seconds;
         result.gpuWatts = gpuEnergy / seconds;
-        result.totalWatts = (cpu + gpuEnergy + other) / seconds;
+        result.totalWatts = (cpu + gpuEnergy + other) / seconds;  // NAN if CPU or GPU is missing
         if (delta) CFRelease(delta);
     }
     if (previous) CFRelease(previous);
