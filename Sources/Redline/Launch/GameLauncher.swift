@@ -21,7 +21,10 @@ enum GameLauncher {
     }
 
     /// `path` can be a `.app` bundle or the game binary itself. `arguments` are passed to the game.
-    static func launch(_ path: String, arguments: [String], onExit: @escaping @Sendable () -> Void) throws -> Process {
+    /// Apple HUD lines from the game's output go to `onHUDLine`; everything else to Redline's stderr,
+    /// so the game's own output never ends up in the CSV on stdout.
+    static func launch(_ path: String, arguments: [String], onHUDLine: @escaping @Sendable (String) -> Void,
+                       onExit: @escaping @Sendable () -> Void) throws -> Process {
         let process = Process()
         process.executableURL = try executableURL(for: URL(fileURLWithPath: path))
         process.arguments = arguments
@@ -29,12 +32,28 @@ enum GameLauncher {
         process.environment = ProcessInfo.processInfo.environment
             .merging(MetalHUDService.environment) { $1 }
             .merging(["DYLD_INSERT_LIBRARIES": try hookURL().path]) { $1 }
+        let output = Pipe()
+        process.standardOutput = output
+        process.standardError = output
+        Task.detached {
+            do {
+                for try await line in output.fileHandleForReading.bytes.lines {
+                    if line.contains("metal-HUD:") { onHUDLine(line) }
+                    else if !isHUDNoise(line) { FileHandle.standardError.write(Data((line + "\n").utf8)) }
+                }
+            } catch {}
+        }
         process.terminationHandler = { game in
             FileHandle.standardError.write(Data("redline: game exited (status \(game.terminationStatus))\n".utf8))
             onExit()
         }
         try process.run()
         return process
+    }
+
+    /// Harmless warnings Apple's HUD prints at startup in every game; hidden so the game's real output stands out.
+    static func isHUDNoise(_ line: String) -> Bool {
+        line.contains("[libMTLHud]") || line.contains("NSEventModifierFlagFunction specified")
     }
 
     private static func hookURL() throws -> URL {

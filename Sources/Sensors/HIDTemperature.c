@@ -1,4 +1,4 @@
-#include "HIDSensors.h"
+#include "Sensors.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <math.h>

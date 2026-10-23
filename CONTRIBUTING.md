@@ -35,8 +35,10 @@ Sources/Redline/
               StatsMonitor polls them once per second
   Launch/     `redline run` command and game launcher
   Logging/    CSV output
+  Session/    per-game session summary
+  Compare/    `redline compare` for two CSV logs
   Support/    app info and web links
-Sources/HIDSensors/   C wrapper for the chip temperature sensors
+Sources/Sensors/      C wrappers for chip sensors: temperatures (HID, SMC), power and clocks (IOReport)
 Sources/FrameCounter/ shared-memory frame counter (hook writes, Redline reads)
 Sources/RedlineHook/  library loaded into games launched with `redline run`
 Tests/RedlineTests/   unit tests

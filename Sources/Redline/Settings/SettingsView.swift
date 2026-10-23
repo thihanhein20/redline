@@ -3,6 +3,7 @@ import SwiftUI
 /// Redline's settings: shown from the menu bar icon and in the settings window.
 struct SettingsView: View {
     @Bindable var overlay: OverlayController
+    let sessions: SessionRecorder
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -15,10 +16,24 @@ struct SettingsView: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.secondary)
                 CornerPicker(selection: $overlay.corner)
-                    .disabled(!overlay.isVisible)
-                    .opacity(overlay.isVisible ? 1 : 0.4)
+                Picker("Detail", selection: $overlay.detail) {
+                    ForEach(OverlayDetail.allCases, id: \.self) { Text($0.title) }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .help("Compact: FPS, CPU, GPU, temperature. Full: everything Redline measures.")
             }
+            .disabled(!overlay.isVisible)
+            .opacity(overlay.isVisible ? 1 : 0.4)
             Divider()
+
+            RecordingRow(sessions: sessions)
+            Divider()
+
+            if let last = sessions.last {
+                LastSessionView(summary: last)
+                Divider()
+            }
 
             VStack(spacing: 2) {
                 MenuRow(title: "Send Feedback", systemImage: "bubble.left") { openURL(FeedbackLinks.sendFeedback) }
@@ -31,7 +46,7 @@ struct SettingsView: View {
 
             MenuRow(title: "Quit Redline", systemImage: "power") { NSApplication.shared.terminate(nil) }
                 .keyboardShortcut("q")
-            shortcutHint
+            ShortcutList()
             Divider()
             credit
         }
@@ -46,21 +61,6 @@ struct SettingsView: View {
                 .tint(.red)
             Spacer()
             Text("v\(SystemInfo.appVersion)")
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 8)
-    }
-
-    private var shortcutHint: some View {
-        HStack {
-            Text("Open settings from anywhere")
-            Spacer()
-            Text(KeyShortcut.toggleSettings.symbol)
-                .font(.caption.monospaced())
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 4))
         }
         .font(.caption)
         .foregroundStyle(.secondary)

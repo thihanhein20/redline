@@ -50,6 +50,11 @@ final class HUDLogFPSService {
         return latest.fps
     }
 
+    /// The game the latest FPS reading came from (call after `fps()`, which drops exited games).
+    var processID: Int32? {
+        latest?.processID
+    }
+
     private func handle(_ line: String) {
         guard let entry = HUDLogEntry.parse(line) else { return }
         defer { previous[entry.processID] = entry }
