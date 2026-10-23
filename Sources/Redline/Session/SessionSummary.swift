@@ -12,7 +12,12 @@ struct SessionSummary {
     var maxGPUTemperature: Double?
     var peakPowerWatts: Double?
     var peakGameMemoryMB: Double?
-    var fastestMemoryGrowthMBPerMinute: Double?
+    var peakMemoryGrowthMBPerMinute: Double?
+    /// Seconds into the session when growth peaked.
+    var peakMemoryGrowthAt: Int?
+    var finalMemoryGrowthMBPerMinute: Double?
+    var longestSustainedGrowthSeconds = 0
+    var worstMemoryStatus = MemoryGrowthStatus.stable
     var peakSwapGB: Double?
     var swappingSeconds = 0
     var peakGameGPUPercent: Double?
@@ -41,13 +46,27 @@ struct SessionSummary {
         maxGPUTemperature = Self.max(maxGPUTemperature, stats.gpuTemperature)
         peakPowerWatts = Self.max(peakPowerWatts, stats.power?.totalWatts)
         peakGameMemoryMB = Self.max(peakGameMemoryMB, stats.game?.memoryMB)
-        fastestMemoryGrowthMBPerMinute = Self.max(fastestMemoryGrowthMBPerMinute, stats.game?.memoryGrowthMBPerMinute)
+        if let game = stats.game { addMemoryTrend(game) }
         peakSwapGB = Self.max(peakSwapGB, stats.swapUsedGB)
         if (stats.swapInMBps ?? 0) + (stats.swapOutMBps ?? 0) >= 1 { swappingSeconds += 1 }
         peakGameGPUPercent = Self.max(peakGameGPUPercent, stats.game?.gpuPercent)
         peakGameCPUPowerWatts = Self.max(peakGameCPUPowerWatts, stats.game?.cpuPowerWatts)
         if stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue { throttledSeconds += 1 }
         if stats.marker != nil { markers += 1 }
+    }
+
+    private mutating func addMemoryTrend(_ game: GameProcess) {
+        if let growth = game.memoryGrowthMBPerMinute {
+            finalMemoryGrowthMBPerMinute = growth
+            if growth > peakMemoryGrowthMBPerMinute ?? -.infinity {
+                peakMemoryGrowthMBPerMinute = growth
+                peakMemoryGrowthAt = seconds
+            }
+        }
+        longestSustainedGrowthSeconds = Swift.max(longestSustainedGrowthSeconds, game.sustainedGrowthSeconds)
+        if game.memoryStatus == .possibleLeak || (game.memoryStatus == .growing && worstMemoryStatus == .stable) {
+            worstMemoryStatus = game.memoryStatus
+        }
     }
 
     private static func max(_ current: Double?, _ new: Double?) -> Double? {

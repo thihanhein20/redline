@@ -14,7 +14,7 @@
 ## Features
 
 - **FPS for any Metal game**: App Store, Steam, iPhone/iPad games on Mac, and your own builds, with a 60-second FPS graph
-- **The game itself**: its own CPU, GPU, memory (with a leak warning and memory graph), GPU memory, disk activity and threads
+- **The game itself**: its own CPU, GPU, memory (with a memory graph and growth check), GPU memory, disk activity and threads
 - **Chip**: CPU and GPU temperatures, power draw (watts), clock speeds, thermal state
 - **Memory**: RAM with an Activity Monitor-style breakdown (app, wired, compressed, cached), memory pressure, swap size and live swap activity, GPU memory
 - **Battery**: charge and drain in watts
@@ -142,7 +142,7 @@ Then use the new **Redline** menu:
 | GPU | GPU driver utilisation statistics |
 | Game CPU, memory, disk, threads | the game process's CPU time, memory footprint, disk I/O and threads (same as Activity Monitor) |
 | Game GPU | the GPU driver's per-app GPU time (Activity Monitor's % GPU) |
-| Memory leak warning | growth of the game's memory over the last minute (after a 10-second warm-up, since games grow while loading) |
+| Memory growth check | a trend line through the game's memory over the last minute (after a 10-second start-up warm-up). Above 10 MB/min it shows **growth detected**; only when that lasts **3 minutes** does it say **possible leak**, since loading levels, streaming and caches also make memory grow. It's a hint to investigate with Unity's Memory Profiler or Instruments, not proof of a leak. |
 | RAM, breakdown, pressure, swap | Activity Monitor's formulas, macOS memory pressure and swap counters |
 | GPU memory | the GPU driver's memory statistics; per game (VRAM) from Apple's HUD output with `redline run` |
 | CPU and GPU temperature | the Mac's SMC sensors (the same ones Stats and iStat Menus read) |

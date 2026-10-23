@@ -39,7 +39,7 @@ struct RunMetrics {
             Metric(label: "Game GPU", value: average(column("game_gpu_pct")), unit: "%", higherIsBetter: false),
             Metric(label: "Game CPU power", value: average(column("game_cpu_power_w")), unit: "W", higherIsBetter: false),
             Metric(label: "Peak game memory", value: column("game_mem_mb").max(), unit: "MB", higherIsBetter: false),
-            Metric(label: "Game memory growth", value: column("game_mem_growth_mb_min").max(), unit: "MB/min", higherIsBetter: false),
+            Metric(label: "Peak memory growth", value: column("game_mem_growth_mb_min").max(), unit: "MB/min", higherIsBetter: false),
             Metric(label: "Peak swap", value: column("swap_gb").max(), unit: "GB", higherIsBetter: false),
             Metric(label: "Max CPU temp", value: cpuTemps.max(), unit: "°C", higherIsBetter: false),
             Metric(label: "Max GPU temp", value: column("gpu_temp_c").max(), unit: "°C", higherIsBetter: false),

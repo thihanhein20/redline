@@ -8,8 +8,10 @@ struct GameProcess {
     var gpuPercent: Double?
     /// Memory footprint, as in Activity Monitor's Memory column.
     var memoryMB: Double
-    /// How fast memory is growing over the last minute; steady growth usually means a leak.
+    /// How fast memory grew over the last minute (loading and caches count too, so this alone isn't a leak).
     var memoryGrowthMBPerMinute: Double?
+    var memoryStatus: MemoryGrowthStatus = .stable
+    var sustainedGrowthSeconds = 0
     /// GPU memory the game has allocated (games launched with `redline run`).
     var metalMemoryMB: Double?
     /// CPU energy only: macOS doesn't split GPU energy by app.

@@ -4,31 +4,30 @@ import Observation
 @MainActor
 @Observable
 final class GameTracker {
-    /// The game's memory over the last minute, for the leak check and the memory graph.
-    private(set) var memoryHistory = History(capacity: 60)
+    private(set) var memory = MemoryGrowthMonitor()
 
     @ObservationIgnored private let process = ProcessService()
     @ObservationIgnored private let gpu = GameGPUService()
     @ObservationIgnored private var owner: Int32?
-    @ObservationIgnored private var secondsSinceStart = 0
-    /// Games balloon in memory while loading; tracking the trend from the start would look like a leak.
-    private static let warmUpSeconds = 10
+
+    /// The game's memory over the last minute, for the overlay's memory graph.
+    var memoryHistory: History { memory.history }
 
     func sample(processID: Int32?, metalMemoryMB: Double?) -> GameProcess? {
         guard let processID, var game = process.stats(for: processID) else {
-            memoryHistory.append(nil)
+            memory.addGap()
             return nil
         }
         if owner != processID {
             owner = processID
-            secondsSinceStart = 0
-            memoryHistory = History(capacity: memoryHistory.capacity)
+            memory = MemoryGrowthMonitor()
         }
-        secondsSinceStart += 1
-        memoryHistory.append(secondsSinceStart > Self.warmUpSeconds ? game.memoryMB : nil)
+        memory.add(game.memoryMB)
         game.gpuPercent = gpu.usage(of: processID)
         game.metalMemoryMB = metalMemoryMB
-        game.memoryGrowthMBPerMinute = MemoryTrend.growthPerMinute(memoryHistory.values.compactMap { $0 })
+        game.memoryGrowthMBPerMinute = memory.growthMBPerMinute
+        game.memoryStatus = memory.status
+        game.sustainedGrowthSeconds = memory.sustainedSeconds
         return game
     }
 }

@@ -14,6 +14,7 @@ struct OverlayRowsTests {
         stats.game = GameProcess(processID: 1, name: "Game", cpuPercent: 45, gpuPercent: 30, memoryMB: 812,
                                  memoryGrowthMBPerMinute: 25, metalMemoryMB: 285, cpuPowerWatts: 4.4,
                                  diskReadMBps: 12, diskWriteMBps: 0, threads: 42)
+        stats.game?.memoryStatus = .growing
         stats.cpuTemperature = 62
         stats.gpuTemperature = 95
         stats.power = ChipPower(cpuWatts: 8, gpuWatts: 3, totalWatts: 12.3, eCoreMHz: 2000, pCoreMHz: 3504, gpuMHz: 1236)
@@ -30,7 +31,7 @@ struct OverlayRowsTests {
     @Test func fullShowsEverything() {
         let items = OverlayRows.items(for: everything, detail: .full)
         #expect(labels(items) == ["FPS", "1% LOW", "STUTTERS", "GPU TIME", "DISPLAY", "CPU", "GPU",
-                                  "GAME", "GAME CPU", "GAME GPU", "GAME MEM", "GAME VRAM", "GAME CPU PWR", "GAME DISK", "THREADS",
+                                  "GAME", "GAME CPU", "GAME GPU", "GAME MEM", "MEM TREND", "GAME VRAM", "GAME CPU PWR", "GAME DISK", "THREADS",
                                   "RAM", "SWAP", "GPU MEM",
                                   "CPU TEMP", "GPU TEMP", "POWER", "CPU CLK", "GPU CLK", "BATTERY", "THERM"])
         #expect(items.contains(.frameTimeGraph))
@@ -47,7 +48,8 @@ struct OverlayRowsTests {
         let items = OverlayRows.items(for: everything, detail: .full)
         #expect(items.contains(.stat(label: "GPU TEMP", value: "95°C", emphasis: .hot)))
         #expect(items.contains(.stat(label: "RAM", value: "8.0/16 GB", emphasis: .warning)))
-        #expect(items.contains(.stat(label: "GAME MEM", value: "812 MB ↑25/m", emphasis: .warning)))  // possible leak
+        #expect(items.contains(.stat(label: "GAME MEM", value: "812 MB ↑25/m", emphasis: .warning)))
+        #expect(items.contains(.stat(label: "MEM TREND", value: "growth detected", emphasis: .warning)))
         #expect(items.contains(.stat(label: "SWAP", value: "1.5 GB ⇅4MB/s", emphasis: .hot)))      // actively swapping
     }
 

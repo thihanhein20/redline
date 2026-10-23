@@ -27,6 +27,7 @@ struct CSVLogger {
         ("game_gpu_pct", { number($0.game?.gpuPercent) }),
         ("game_mem_mb", { number($0.game?.memoryMB, digits: 0) }),
         ("game_mem_growth_mb_min", { number($0.game?.memoryGrowthMBPerMinute) }),
+        ("game_mem_status", { $0.game?.memoryStatus.rawValue ?? "" }),
         ("game_metal_mb", { number($0.game?.metalMemoryMB, digits: 0) }),
         ("game_cpu_power_w", { number($0.game?.cpuPowerWatts, digits: 2) }),
         ("game_disk_read_mbps", { number($0.game?.diskReadMBps, digits: 2) }),
