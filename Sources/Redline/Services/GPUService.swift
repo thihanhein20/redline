@@ -1,25 +1,31 @@
 import IOKit
 
-/// GPU usage (0–100 %) read from the GPU driver's IORegistry statistics.
+/// Whole-GPU usage and memory, from the GPU driver's IORegistry statistics.
 struct GPUService {
-    func usage() -> Double? {
-        var iterator: io_iterator_t = 0
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOAccelerator"), &iterator) == KERN_SUCCESS else {
-            return nil
-        }
-        defer { IOObjectRelease(iterator) }
-
-        while case let entry = IOIteratorNext(iterator), entry != 0 {
-            defer { IOObjectRelease(entry) }
-            if let utilization = performanceStatistics(of: entry)?["Device Utilization %"] as? Int {
-                return Double(utilization)
-            }
-        }
-        return nil
+    struct Reading {
+        var usage: Double?
+        var memoryInUseMB: Double?
     }
 
-    private func performanceStatistics(of entry: io_registry_entry_t) -> [String: Any]? {
-        IORegistryEntryCreateCFProperty(entry, "PerformanceStatistics" as CFString, kCFAllocatorDefault, 0)?
-            .takeRetainedValue() as? [String: Any]
+    func sample() -> Reading {
+        var reading = Reading()
+        Self.forEachAccelerator { accelerator in
+            guard let stats = IORegistryEntryCreateCFProperty(accelerator, "PerformanceStatistics" as CFString, kCFAllocatorDefault, 0)?
+                .takeRetainedValue() as? [String: Any] else { return }
+            if let utilization = stats["Device Utilization %"] as? Int { reading.usage = Double(utilization) }
+            if let bytes = stats["In use system memory"] as? Int { reading.memoryInUseMB = Double(bytes) / 1_048_576 }
+        }
+        return reading
+    }
+
+    /// Calls `body` with each GPU's IORegistry entry (Apple Silicon Macs have one).
+    static func forEachAccelerator(_ body: (io_registry_entry_t) -> Void) {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOAccelerator"), &iterator) == KERN_SUCCESS else { return }
+        defer { IOObjectRelease(iterator) }
+        while case let entry = IOIteratorNext(iterator), entry != 0 {
+            body(entry)
+            IOObjectRelease(entry)
+        }
     }
 }

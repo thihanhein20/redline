@@ -2,7 +2,7 @@ import Foundation
 
 /// App and Mac details attached to bug reports.
 enum SystemInfo {
-    static let appVersion = "0.1.0"
+    static let appVersion = "0.2.0"
 
     static var summary: String {
         let os = ProcessInfo.processInfo.operatingSystemVersion

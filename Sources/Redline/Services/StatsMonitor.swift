@@ -6,15 +6,29 @@ import Observation
 @Observable
 final class StatsMonitor {
     private(set) var stats = SystemStats()
+    /// FPS for the last 60 seconds, for the overlay's graph.
+    private(set) var fpsHistory = History(capacity: 60)
     /// Called after every refresh, e.g. for logging.
     @ObservationIgnored var onUpdate: ((SystemStats) -> Void)?
+    /// The game started by `redline run`, if any; otherwise the game is whichever reports FPS.
+    @ObservationIgnored var launchedGameID: Int32?
+    /// Last marker added with the hotkey, for the overlay to show briefly.
+    private(set) var lastMarker: (number: Int, at: Date)?
+    @ObservationIgnored private var pendingMarker: Int?
 
     @ObservationIgnored private let fps = FPSService()
     @ObservationIgnored private let hudFPS = HUDLogFPSService()
+    @ObservationIgnored private let frameTiming = FrameTimingService()
     @ObservationIgnored private let cpu = CPUService()
     @ObservationIgnored private let gpu = GPUService()
     @ObservationIgnored private let memory = MemoryService()
+    /// The game being measured (its memory history feeds the overlay's memory graph).
+    let game = GameTracker()
     @ObservationIgnored private let temperature = TemperatureService()
+    @ObservationIgnored private let power = PowerService()
+    @ObservationIgnored private let battery = BatteryService()
+    @ObservationIgnored private let display = DisplayService()
+    @ObservationIgnored private var latestHUDReport: (report: HUDFrameReport, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     func start(interval: Duration = .seconds(1)) {
@@ -34,17 +48,51 @@ final class StatsMonitor {
         pollTask = nil
     }
 
+    /// Marks this moment in the CSV (e.g. "boss fight starts").
+    func addMarker() {
+        let number = (lastMarker?.number ?? 0) + 1
+        lastMarker = (number, Date())
+        pendingMarker = number
+    }
+
+    /// Output lines from a game started by `redline run` (Apple HUD lines carry GPU time per frame).
+    func receiveGameOutput(_ line: String) {
+        if let report = HUDFrameReport.parse(line) { latestHUDReport = (report, Date()) }
+    }
+
     private func refresh() {
+        // Hook FPS (games run via `redline run`) is exact and uncapped; HUD log covers every other game.
+        let currentFPS = fps.fps() ?? hudFPS.fps()
+        let hudReport = latestHUDReport.flatMap { Date().timeIntervalSince($0.at) < 2 ? $0.report : nil }
+        let gpuReading = gpu.sample()
+        let memoryReading = memory.sample()
         stats = SystemStats(
-            // Hook FPS (games run via `redline run`) is exact and uncapped; HUD log covers every other game.
-            fps: fps.fps() ?? hudFPS.fps(),
+            fps: currentFPS,
+            pacing: frameTiming.sample(),
+            gpuFrameMS: hudReport?.medianGPUTimeMS,
+            displayHz: display.refreshRate(),
             cpuUsage: cpu.usage(),
-            gpuUsage: gpu.usage(),
-            memoryUsedGB: memory.usedGB(),
+            gpuUsage: gpuReading.usage,
+            memoryUsedGB: memoryReading?.usedGB,
             memoryTotalGB: memory.totalGB,
-            socTemperature: temperature.socTemperature(),
-            thermalState: ProcessInfo.processInfo.thermalState
+            memoryBreakdown: memoryReading?.breakdown,
+            memoryPressure: memory.pressure(),
+            swapUsedGB: memory.swapUsedGB(),
+            swapInMBps: memoryReading?.swapInMBps,
+            swapOutMBps: memoryReading?.swapOutMBps,
+            gpuMemoryMB: gpuReading.memoryInUseMB,
+            game: game.sample(processID: launchedGameID ?? hudFPS.processID, metalMemoryMB: hudReport?.metalMemoryMB),
+            cpuTemperature: temperature.cpu(),
+            gpuTemperature: temperature.gpu(),
+            socTemperature: temperature.soc(),
+            power: power.sample(),
+            battery: battery.status(),
+            thermalState: ProcessInfo.processInfo.thermalState,
+            marker: pendingMarker
         )
+        pendingMarker = nil
+        fpsHistory.append(currentFPS)
         onUpdate?(stats)
     }
+
 }

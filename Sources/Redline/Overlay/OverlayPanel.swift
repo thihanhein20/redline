@@ -14,9 +14,10 @@ final class OverlayPanel: NSPanel {
         hasShadow = false
         ignoresMouseEvents = true
 
-        let hostingView = NSHostingView(rootView: content)
-        contentView = hostingView
-        setContentSize(hostingView.fittingSize)
+        // The window follows the view's size, so switching Compact/Full or new rows appearing resizes it.
+        let controller = NSHostingController(rootView: content)
+        controller.sizingOptions = .preferredContentSize
+        contentViewController = controller
     }
 
     /// Moves the panel to `corner` of the main screen, clear of the menu bar and Dock.

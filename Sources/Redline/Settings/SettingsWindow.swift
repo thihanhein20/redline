@@ -5,10 +5,12 @@ import SwiftUI
 @MainActor
 final class SettingsWindow {
     private let overlay: OverlayController
+    private let sessions: SessionRecorder
     private var window: NSWindow?
 
-    init(overlay: OverlayController) {
+    init(overlay: OverlayController, sessions: SessionRecorder) {
         self.overlay = overlay
+        self.sessions = sessions
     }
 
     func show() {
@@ -31,8 +33,10 @@ final class SettingsWindow {
         let window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = "Redline"
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(rootView: SettingsView(overlay: overlay))
-        window.setContentSize(window.contentView!.fittingSize)
+        // The window follows the view's size (e.g. when a "Last Session" section appears).
+        let controller = NSHostingController(rootView: SettingsView(overlay: overlay, sessions: sessions))
+        controller.sizingOptions = .preferredContentSize
+        window.contentViewController = controller
         window.center()
         return window
     }
