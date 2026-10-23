@@ -4,7 +4,7 @@ import Foundation
 enum SessionReport {
     /// The few numbers worth seeing at a glance.
     static func highlights(for summary: SessionSummary) -> [(label: String, value: String)] {
-        let worstFPS = summary.worstOnePercentLow.map { ("Worst 1% low", number($0)) } ?? ("Lowest FPS", number(summary.minFPS))
+        let worstFPS = summary.sessionOnePercentLow.map { ("1% low", number($0)) } ?? ("Lowest FPS", number(summary.minFPS))
         return [
             ("Game", summary.game ?? "Unknown"),
             ("Duration", duration(summary.seconds)),
@@ -22,8 +22,9 @@ enum SessionReport {
             ("Average FPS", number(summary.averageFPS)),
             ("Lowest FPS", number(summary.minFPS)),
         ]
-        if let low = summary.worstOnePercentLow { lines.append(("Worst 1% low", number(low))) }
-        if summary.stutters > 0 { lines.append(("Stutters", "\(summary.stutters)")) }
+        if let low = summary.sessionOnePercentLow { lines.append(("1% low (session)", number(low))) }
+        if let low = summary.worstOnePercentLow { lines.append(("Lowest 1% low (10 s)", number(low))) }
+        if summary.stutters > 0 { lines.append(("Stutters (hitches)", "\(summary.stutters)")) }
         lines += [
             ("Max CPU temp", celsius(summary.maxCPUTemperature)),
             ("Max GPU temp", celsius(summary.maxGPUTemperature)),
@@ -33,7 +34,7 @@ enum SessionReport {
             ("Peak game CPU power", summary.peakGameCPUPowerWatts.map(StatFormat.watts) ?? StatFormat.placeholder),
             ("Peak swap", summary.peakSwapGB.map { String(format: "%.1f GB", $0) } ?? StatFormat.placeholder),
             ("Time swapping", duration(summary.swappingSeconds)),
-            ("Time throttled", duration(summary.throttledSeconds)),
+            ("Time in serious thermal state", duration(summary.seriousThermalSeconds)),
         ]
         lines += memoryLines(summary)
         if summary.markers > 0 { lines.append(("Markers", "\(summary.markers)")) }

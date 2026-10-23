@@ -37,6 +37,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sessions.record(stats)
         }
         monitor.start()
+        guard !RedlineInstances.isHeadless else {
+            FileHandle.standardError.write(Data("redline: Redline is already open, so its overlay shows this game; logging here only.\n".utf8))
+            return
+        }
         overlay.show()
         hotKeys = [
             GlobalHotKey(.toggleSettings) { [weak self] in self?.settingsWindow.toggle() },

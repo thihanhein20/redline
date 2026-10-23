@@ -6,7 +6,10 @@ struct SessionSummary {
     var startedAt = Date()
     var seconds = 0
     var minFPS: Double?
+    /// Lowest 10-second 1% low seen (includes loading screens and transitions).
     var worstOnePercentLow: Double?
+    /// 1% low over every frame of the session.
+    var sessionOnePercentLow: Double?
     var stutters = 0
     var maxCPUTemperature: Double?
     var maxGPUTemperature: Double?
@@ -22,7 +25,8 @@ struct SessionSummary {
     var swappingSeconds = 0
     var peakGameGPUPercent: Double?
     var peakGameCPUPowerWatts: Double?
-    var throttledSeconds = 0
+    /// Time macOS reported a serious or critical thermal state (not a direct measure of throttling).
+    var seriousThermalSeconds = 0
     var markers = 0
     private var fpsTotal = 0.0
     private var fpsSamples = 0
@@ -41,6 +45,7 @@ struct SessionSummary {
             minFPS = Swift.min(minFPS ?? fps, fps)
         }
         if let low = stats.pacing?.onePercentLowFPS { worstOnePercentLow = Swift.min(worstOnePercentLow ?? low, low) }
+        sessionOnePercentLow = stats.pacing?.sessionOnePercentLowFPS ?? sessionOnePercentLow
         stutters = Swift.max(stutters, stats.pacing?.stutters ?? 0)
         maxCPUTemperature = Self.max(maxCPUTemperature, stats.cpuTemperature ?? stats.socTemperature)
         maxGPUTemperature = Self.max(maxGPUTemperature, stats.gpuTemperature)
@@ -51,7 +56,7 @@ struct SessionSummary {
         if (stats.swapInMBps ?? 0) + (stats.swapOutMBps ?? 0) >= 1 { swappingSeconds += 1 }
         peakGameGPUPercent = Self.max(peakGameGPUPercent, stats.game?.gpuPercent)
         peakGameCPUPowerWatts = Self.max(peakGameCPUPowerWatts, stats.game?.cpuPowerWatts)
-        if stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue { throttledSeconds += 1 }
+        if stats.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue { seriousThermalSeconds += 1 }
         if stats.marker != nil { markers += 1 }
     }
 

@@ -28,7 +28,7 @@ enum GameLauncher {
         let process = Process()
         process.executableURL = try executableURL(for: URL(fileURLWithPath: path))
         process.arguments = arguments
-        // Hook for exact FPS; Metal HUD as the fallback when macOS blocks the hook.
+        // Hook for frame-by-frame FPS; Metal HUD as the fallback when macOS blocks the hook.
         process.environment = ProcessInfo.processInfo.environment
             .merging(MetalHUDService.environment) { $1 }
             .merging(["DYLD_INSERT_LIBRARIES": try hookURL().path]) { $1 }

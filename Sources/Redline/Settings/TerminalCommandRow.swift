@@ -35,7 +35,7 @@ struct TerminalCommandRow: View {
                     message = CommandLineInstaller.install()
                     isInstalled = CommandLineInstaller.isInstalled
                 }
-                .help("Adds `redline` to Terminal so you can launch your own builds with exact FPS")
+                .help("Adds `redline` to Terminal so you can launch your own builds with frame-by-frame FPS")
             }
             if let message {
                 Text(message)

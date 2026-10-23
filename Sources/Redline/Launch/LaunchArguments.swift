@@ -5,6 +5,10 @@ import AppKit
 ///   redline run <Game.app> [game args...]   also launch the game with FPS counting, quit when it exits
 ///   redline compare <before.csv> <after.csv> print a side-by-side comparison of two runs and exit
 enum LaunchArguments {
+    static var isRunCommand: Bool {
+        CommandLine.arguments.dropFirst().first == "run"
+    }
+
     /// Handles `compare` before the app starts, so no overlay or menu bar icon appears.
     static func compareIfRequested() {
         let arguments = Array(CommandLine.arguments.dropFirst())

@@ -18,6 +18,8 @@ final class SessionRecorder {
     }
     @ObservationIgnored private var current: SessionSummary?
     @ObservationIgnored private var log: SessionLog?
+    /// The game this session belongs to; a different game starts a new session.
+    @ObservationIgnored private var processID: Int32?
     @ObservationIgnored private var quietSeconds = 0
 
     func record(_ stats: SystemStats) {
@@ -27,17 +29,19 @@ final class SessionRecorder {
             return
         }
         quietSeconds = 0
+        if let gameID = stats.game?.processID, let processID, gameID != processID { finish() }
         if current == nil {
             current = SessionSummary()
             if savesToDisk { log = SessionLog(game: stats.game?.name, startedAt: Date()) }
         }
+        processID = processID ?? stats.game?.processID
         current?.add(stats)
         log?.append(stats)
     }
 
     /// Ends the current session and prints its summary to stderr (the Terminal, or the Unity log).
     func finish() {
-        defer { current = nil; log = nil }
+        defer { current = nil; log = nil; processID = nil }
         guard let current, current.seconds >= Self.minimumSeconds else {
             log?.discard()
             return
