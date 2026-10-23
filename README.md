@@ -32,6 +32,11 @@
 - macOS 14 Sonoma or newer
 - An administrator account (needed to read FPS; other stats work on any account)
 
+> **Tested on:** MacBook Air M2, macOS 26, with Unity builds and App Store games.
+> Other Apple Silicon Macs (M1, M3, M4 and their Pro/Max versions) should work, but haven't been tested yet.
+> Redline hides any reading it can't get rather than showing a wrong number, so on another chip you might see a few rows missing (most likely clock speeds or the separate CPU/GPU temperatures).
+> If something is missing or looks wrong, please use **Report an Issue** in Redline's settings: it fills in your Mac model and chip automatically.
+
 ## Install
 
 1. Download the latest `Redline-x.y.z.dmg` from [Releases](https://github.com/thihanhein20/redline/releases).
