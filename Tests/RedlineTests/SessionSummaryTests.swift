@@ -13,7 +13,7 @@ struct SessionSummaryTests {
         #expect(summary.averageFPS == 50)
         #expect(summary.minFPS == 40)
         #expect(summary.maxCPUTemperature == 80)
-        #expect(summary.throttledSeconds == 1)
+        #expect(summary.seriousThermalSeconds == 1)
         #expect(summary.markers == 1)
     }
 

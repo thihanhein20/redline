@@ -1,6 +1,7 @@
 // Loaded into the game via DYLD_INSERT_LIBRARIES.
-// Counts one frame every time the game asks its CAMetalLayer for a new drawable,
-// which Metal games (including Unity) do exactly once per rendered frame.
+// Counts one frame each time the game gets a new drawable from a CAMetalLayer, which Metal games
+// (including Unity) do once per frame they render. Requests that come back empty (timeouts) aren't counted.
+// Limit: a game drawing to several Metal layers counts frames from all of them.
 
 #import <QuartzCore/CAMetalLayer.h>
 #import <objc/runtime.h>
@@ -11,8 +12,9 @@
 static id (*originalNextDrawable)(id, SEL);
 
 static id countingNextDrawable(id self, SEL _cmd) {
-    frame_counter_tick();
-    return originalNextDrawable(self, _cmd);
+    id drawable = originalNextDrawable(self, _cmd);
+    if (drawable) frame_counter_tick();
+    return drawable;
 }
 
 __attribute__((constructor))

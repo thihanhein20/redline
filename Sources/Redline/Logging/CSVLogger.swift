@@ -6,6 +6,7 @@ struct CSVLogger {
     static let columns: [(name: String, value: @Sendable (SystemStats) -> String)] = [
         ("fps", { number($0.fps) }),
         ("fps_1pct_low", { number($0.pacing?.onePercentLowFPS) }),
+        ("fps_1pct_low_session", { number($0.pacing?.sessionOnePercentLowFPS) }),
         ("stutters", { $0.pacing.map { "\($0.stutters)" } ?? "" }),
         ("gpu_frame_ms", { number($0.gpuFrameMS, digits: 2) }),
         ("display_hz", { $0.displayHz.map(String.init) ?? "" }),

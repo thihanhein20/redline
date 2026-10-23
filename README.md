@@ -19,12 +19,12 @@
 - **Memory**: RAM with an Activity Monitor-style breakdown (app, wired, compressed, cached), memory pressure, swap size and live swap activity, GPU memory
 - **Battery**: charge and drain in watts
 - **Compact or Full overlay**: just the essentials, or everything above
-- **Session summary** when you close a game: average FPS, worst 1% low, stutters, max temperature, peak power and memory
+- **Session summary** when you close a game: average FPS, 1% low, stutters, max temperature, peak power and memory
 - **Record sessions**: one CSV log and summary saved for every game you play, no Terminal needed
 - **Overlay in any corner**: transparent, click-through, stays on top of full-screen games
 - **No permissions needed**: no Screen Recording, no Accessibility
 - **Menu bar app**: no Dock icon, open settings anywhere with **⌃⌥R**
-- **Developer mode**: exact, uncapped FPS and CSV logs for your own Unity/Metal builds
+- **Developer mode**: uncapped FPS counted frame by frame, plus CSV logs, for your own Unity/Metal builds
 
 ## Requirements
 
@@ -79,14 +79,14 @@ Redline gets FPS from Apple's built-in Metal Performance HUD, running hidden in 
 
 > **Can't see the menu bar icon?** On MacBooks with a notch, a crowded menu bar can hide it behind the notch. Use **⌃⌥R** instead, or hold **⌘** and drag other menu bar icons to make room.
 
-## For developers: exact FPS and CSV logs
+## For developers: frame-by-frame FPS and CSV logs
 
-Testing your own Unity or Metal build? Run it through Redline to count every frame directly, with no screen refresh cap, and log the stats to a CSV file.
+Testing your own Unity or Metal build? Run it through Redline to count its frames one by one, with no screen refresh cap, and log the stats to a CSV file.
 
 Launched this way, Redline also measures frame pacing:
 
-- **1% low FPS**: average FPS of the slowest 1% of frames, the standard stutter number
-- **Stutters**: frames that took more than twice as long as a typical frame
+- **1% low FPS**: average FPS of the slowest 1% of frames. The overlay shows the last 10 seconds; the session summary also gives it over every frame of the session, so a loading screen doesn't define the result
+- **Stutters**: hitches where frames took more than twice as long as a typical frame. A run of slow frames in a row counts as one stutter
 - **Frame-time graph**: every frame of the last ~2 seconds; spikes are hitches
 - **GPU time per frame**: tells you whether slow frames are GPU-bound
 
@@ -115,7 +115,7 @@ redline compare before.csv after.csv
 ```
                     before     after           Change
 Average FPS           57.1      60.0     +5.1% better
-Average 1% low         7.6      25.4   +234.7% better
+1% low (session)       7.6      25.4   +234.7% better
 Stutters                 4         0   -100.0% better
 Average power        4.5 W     3.5 W    -22.9% better
 ```
@@ -172,6 +172,9 @@ scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 
 - Clock speeds are read on M1 and M2 chips; on other chips those rows are hidden.
 - Frame pacing (1% low, stutters, frame-time graph, GPU time) needs `redline run`; for other games macOS only reports FPS about once a second.
+- `redline run` counts each frame the game gets a drawable for. A game that draws to several Metal layers at once would count frames from all of them.
+- If several apps report FPS at once, Redline follows the one in front.
+- "Time in serious thermal state" is how long macOS reported a serious or critical thermal state. It's a strong hint of throttling, not a direct measurement of it.
 - Some games capture the whole keyboard, so **⌃⌥R** may not work inside them. Use the menu bar icon instead.
 
 ## Feedback

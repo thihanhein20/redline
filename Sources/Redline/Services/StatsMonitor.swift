@@ -61,8 +61,9 @@ final class StatsMonitor {
     }
 
     private func refresh() {
-        // Hook FPS (games run via `redline run`) is exact and uncapped; HUD log covers every other game.
-        let currentFPS = fps.fps() ?? hudFPS.fps()
+        // Hook FPS (games run via `redline run`) is counted frame by frame and uncapped; HUD log covers every other game.
+        let hud = hudFPS.current()
+        let currentFPS = fps.fps() ?? hud?.fps
         let hudReport = latestHUDReport.flatMap { Date().timeIntervalSince($0.at) < 2 ? $0.report : nil }
         let gpuReading = gpu.sample()
         let memoryReading = memory.sample()
@@ -81,7 +82,7 @@ final class StatsMonitor {
             swapInMBps: memoryReading?.swapInMBps,
             swapOutMBps: memoryReading?.swapOutMBps,
             gpuMemoryMB: gpuReading.memoryInUseMB,
-            game: game.sample(processID: launchedGameID ?? hudFPS.processID, metalMemoryMB: hudReport?.metalMemoryMB),
+            game: game.sample(processID: launchedGameID ?? hud?.processID, metalMemoryMB: hudReport?.metalMemoryMB),
             cpuTemperature: temperature.cpu(),
             gpuTemperature: temperature.gpu(),
             socTemperature: temperature.soc(),
