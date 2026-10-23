@@ -38,7 +38,8 @@ enum GameLauncher {
     }
 
     private static func hookURL() throws -> URL {
-        let url = Bundle.main.executableURL!.deletingLastPathComponent().appendingPathComponent(hookFileName)
+        let url = Bundle.main.executableURL!.resolvingSymlinksInPath()
+            .deletingLastPathComponent().appendingPathComponent(hookFileName)
         guard FileManager.default.fileExists(atPath: url.path) else { throw LaunchError.hookNotBuilt(url) }
         return url
     }

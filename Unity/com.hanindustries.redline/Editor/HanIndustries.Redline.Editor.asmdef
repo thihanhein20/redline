@@ -1,0 +1,6 @@
+{
+  "name": "HanIndustries.Redline.Editor",
+  "rootNamespace": "HanIndustries.Redline.Editor",
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

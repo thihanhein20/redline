@@ -22,8 +22,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Accessory: menu bar only, no Dock icon, never steals focus from the game.
         NSApplication.shared.setActivationPolicy(.accessory)
         quitCleanlyOnSignals()
-        metalHUD.enable()
         game = LaunchArguments.launchGameIfRequested()
+        // `redline run` passes the HUD settings to its game directly; leave the system-wide setting
+        // to the Redline app so a Terminal run never switches it off under a running app.
+        if game == nil { metalHUD.enable() }
 
         logger.start()
         monitor.onUpdate = { [logger] in logger.log($0) }
@@ -42,7 +44,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         monitor.stop()
-        metalHUD.disable()
+        if game == nil { metalHUD.disable() }
     }
 
     /// Ctrl-C / kill would skip `applicationWillTerminate` and leave the Metal HUD on; route them through it.
