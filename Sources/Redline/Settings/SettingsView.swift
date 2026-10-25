@@ -60,7 +60,7 @@ struct SettingsView: View {
             Link("Han Industries", destination: FeedbackLinks.developer)
                 .tint(.red)
             Spacer()
-            Text("v\(SystemInfo.appVersion)")
+            Text("v\(SystemInfo.displayVersion)")
         }
         .font(.caption)
         .foregroundStyle(.secondary)
