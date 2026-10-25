@@ -45,8 +45,18 @@ cat > "$APP/Contents/Info.plist" <<EOF
 </plist>
 EOF
 
-# Ad-hoc signature: runs on this Mac. Public releases need a Developer ID signature + notarization.
-codesign --force --sign - "$APP/Contents/MacOS/libRedlineHook.dylib"
-codesign --force --sign - "$APP"
+source scripts/signing.sh
+# Inside out: the hook library first, then the app around it.
+if [[ -n "$SIGN_IDENTITY" ]]; then
+    # Developer ID + Hardened Runtime + secure timestamp: what Apple's notarization requires.
+    for target in "$APP/Contents/MacOS/libRedlineHook.dylib" "$APP"; do
+        codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$target"
+    done
+    echo "Signed with $SIGN_IDENTITY"
+else
+    codesign --force --sign - "$APP/Contents/MacOS/libRedlineHook.dylib"
+    codesign --force --sign - "$APP"
+    echo "No Developer ID certificate found: ad-hoc signed (fine on this Mac; downloads will get Gatekeeper warnings)"
+fi
 
 echo "Built $APP (version $VERSION)"

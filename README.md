@@ -9,6 +9,8 @@
   See FPS, CPU, GPU, RAM and temperature on top of any game.
 </p>
 
+<p align="center"><b>Public beta (0.2.0).</b> Works on the tested Mac; reports from other Macs are very welcome.</p>
+
 ---
 
 ## Features
@@ -41,24 +43,9 @@
 
 1. Download the latest `Redline-x.y.z.dmg` from [Releases](https://github.com/thihanhein20/redline/releases).
 2. Open the DMG and drag **Redline** onto **Applications**.
-3. Open Redline. macOS will show:
+3. Open Redline. The first time, macOS asks whether you want to open an app downloaded from the internet: click **Open**.
 
-   > *"Redline" Not Opened. Apple could not verify "Redline" is free of malware…*
-
-   This happens because Redline isn't signed with a paid Apple Developer ID. The source code is all here if you want to check it. Click **Done** (not *Move to Trash*).
-4. Open **System Settings → Privacy & Security**, scroll down to *"Redline" was blocked…* and click **Open Anyway**. Enter your password.
-
-You only need to do this once.
-
-<details>
-<summary>Prefer Terminal?</summary>
-
-After step 2, this removes the "downloaded from the internet" flag so macOS opens it directly:
-
-```bash
-xattr -dr com.apple.quarantine /Applications/Redline.app
-```
-</details>
+Redline is signed with a Developer ID and notarized by Apple, so it opens like any other downloaded app.
 
 ## How to use
 
@@ -167,6 +154,8 @@ swift build && swift test
 scripts/build-app.sh     # → build/Redline.app
 scripts/make-dmg.sh      # → build/Redline-x.y.z.dmg
 ```
+
+Without a Developer ID certificate in your keychain, the scripts sign the app ad-hoc: it runs on your Mac, but copies you share will trigger Gatekeeper warnings. With one, `make-dmg.sh` also signs, notarizes and staples the DMG (see `scripts/signing.sh`).
 
 ## Known limitations
 
